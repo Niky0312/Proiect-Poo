@@ -1,0 +1,132 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace CereriDeplasare
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            ManagerCereri manager = new ManagerCereri();
+
+            while (true)
+            {
+                Console.WriteLine("\n1. Creează cerere de decontare\n2. Vizualizează cereri de decontare\n3. Modifică cerere de decontare\n4. Ieșire\n");
+                Console.Write("Alege o opțiune: ");
+                int optiune = int.Parse(Console.ReadLine());
+
+                switch (optiune)
+                {
+                    case 1:
+                        manager.CreeazaCerereDecontare();
+                        break;
+                    case 2:
+                        manager.VizualizeazaCereriDecontare();
+                        break;
+                    case 3:
+                        manager.ModificaCerereDecontare();
+                        break;
+                    case 4:
+                        return;
+                    default:
+                        Console.WriteLine("Opțiune invalidă!");
+                        break;
+                }
+            }
+        }
+    }
+
+    public class DocumentDecontare
+    {
+        public string TipDocument { get; set; } // Transport, Masa, Cazare
+        public decimal Suma { get; set; }
+    }
+
+    public class CerereDecontare
+    {
+        public int Id { get; set; }
+        public int IdCererePreAprobare { get; set; }
+        public List<DocumentDecontare> Documente { get; set; } = new List<DocumentDecontare>();
+        public bool EsteAprobata { get; set; }
+    }
+
+    public class ManagerCereri
+    {
+        private List<CerereDecontare> cereriDecontare = new List<CerereDecontare>();
+        private int idGenerator = 1;
+
+        public void CreeazaCerereDecontare()
+        {
+            Console.Write("ID cerere pre-aprobare: ");
+            int id = int.Parse(Console.ReadLine());
+
+            CerereDecontare cerereDecontare = new CerereDecontare
+            {
+                Id = idGenerator++,
+                IdCererePreAprobare = id,
+                EsteAprobata = false
+            };
+
+            Console.Write("Număr documente justificative: ");
+            int nrDocumente = int.Parse(Console.ReadLine());
+
+            for (int i = 0; i < nrDocumente; i++)
+            {
+                DocumentDecontare document = new DocumentDecontare();
+
+                Console.Write("Tip document (Transport/Masa/Cazare): ");
+                document.TipDocument = Console.ReadLine();
+
+                Console.Write("Suma: ");
+                document.Suma = decimal.Parse(Console.ReadLine());
+
+                cerereDecontare.Documente.Add(document);
+            }
+
+            cereriDecontare.Add(cerereDecontare);
+            Console.WriteLine("Cererea de decontare a fost creată cu succes!");
+        }
+
+        public void VizualizeazaCereriDecontare()
+        {
+            foreach (var cerere in cereriDecontare)
+            {
+                Console.WriteLine($"ID: {cerere.Id}, ID Cerere Pre-Aprobare: {cerere.IdCererePreAprobare}, Aprobat: {cerere.EsteAprobata}");
+            }
+        }
+
+        public void ModificaCerereDecontare()
+        {
+            Console.Write("ID cerere decontare: ");
+            int id = int.Parse(Console.ReadLine());
+            var cerere = cereriDecontare.FirstOrDefault(c => c.Id == id && !c.EsteAprobata);
+
+            if (cerere == null)
+            {
+                Console.WriteLine("Cererea nu există sau este deja aprobată!");
+                return;
+            }
+
+            cerere.Documente.Clear();
+
+            Console.Write("Număr documente justificative noi: ");
+            int nrDocumente = int.Parse(Console.ReadLine());
+
+            for (int i = 0; i < nrDocumente; i++)
+            {
+                DocumentDecontare document = new DocumentDecontare();
+
+                Console.Write("Tip document (Transport/Masa/Cazare): ");
+                document.TipDocument = Console.ReadLine();
+
+                Console.Write("Suma: ");
+                document.Suma = decimal.Parse(Console.ReadLine());
+
+                cerere.Documente.Add(document);
+            }
+
+            Console.WriteLine("Cererea de decontare a fost modificată cu succes!");
+        }
+    }
+}
